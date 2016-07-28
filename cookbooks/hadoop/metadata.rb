@@ -1,0 +1,5 @@
+maintainer        "E Parland"
+maintainer_email  "parland@ya.ru"
+description       "Installs Hadoop packages for system"
+version           "0.0.1"
+name		  "hadoop"

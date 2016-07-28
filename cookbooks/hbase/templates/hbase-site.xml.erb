@@ -1,0 +1,18 @@
+<configuration>
+  <property>
+    <name>hbase.rootdir</name>
+    <value>hdfs://<%= @master_host %>:<%= @namenode_port %>/hbase</value>
+  </property>
+  <property>
+    <name>hbase.cluster.distributed</name>
+    <value>true</value>
+  </property>
+  <property>
+    <name>hbase.zookeeper.quorum</name>
+    <value><% @zk_nodes.each do |zk_node| -%><%= zk_node %>,<% end -%></value>
+  </property>
+  <property>
+    <name>hbase.zookeeper.property.dataDir</name>
+    <value>/<%= @data_folder %>/zookeeper</value>
+  </property>
+</configuration>
