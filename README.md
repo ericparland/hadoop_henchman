@@ -24,6 +24,7 @@ The Henchman is a small server-like script, which serves as a REST API interface
   Right now there are 4 types of calls:
   - http://{address}/file/{somefile} - GET - for getting files from Henchman working directory (for example, configuration or recipe file)
   - http://{address}/api/run_chef - POST - serves for 2 purposes: to update config file (attr.json) and to run Chef with chosen steps. Send a POST  request like this:
+```json
     {
     "some_configuration":{
        "some_key":"some_value",
@@ -37,6 +38,7 @@ The Henchman is a small server-like script, which serves as a REST API interface
     }
   - http://{address}/api/get_config - GET - get the config file (attr.json)
   - http://{address}/api/{hadoop,hbase}/{stop_datanode,start_hbase,etc} - GET - trigger some action
+```
 
 Example:
 Let's say, we want to change something in our configuration, for example, HDFS replication factor from 1 to 3.
@@ -46,6 +48,7 @@ With henchman it's easy. All we need to do is to:
 3. Re-start HDFS
 
 Here is our configuration file:
+```json
 {
     "deploy":{
 	    "directory":"/home/develop/deploy"
@@ -85,18 +88,19 @@ Here is our configuration file:
         "recipe[hadoop::generate_hdfs-site_xml]"
     ]
 }
-
+```
 We have changed replication factor and we can save it as attrs.json. After that we perform curl for all our nodes:
-
+``` bash
 HOSTS=`cat attrs.json | ./jq -r '.hadoop.hadoop_hosts.datanodes' |sed  "/\[\|\]/d" | tr -d ',\n' |tr -d '"'`
 for HOST in $HOSTS
 do
    curl -vX POST http://$HOST:5000/api/run_chef -d @attrs.json --header "Content-Type: application/json"
 done
-
+``` 
 Then, we restart HDFS:
+``` bash
 curl -i test-01:5000/api/hadoop/stop_dfs; curl -i test-01:5000/api/hadoop/start_dfs
-
+``` 
 And it's done.
 
   TODO:
