@@ -38,6 +38,67 @@ The Henchman is a small server-like script, which serves as a REST API interface
   - http://{address}/api/get_config - GET - get the config file (attr.json)
   - http://{address}/api/{hadoop,hbase}/{stop_datanode,start_hbase,etc} - GET - trigger some action
 
+Example:
+Let's say, we want to change something in our configuration, for example, HDFS replication factor from 1 to 3.
+With henchman it's easy. All we need to do is to:
+1. Update variables configuration
+2. Re-generate hdfs-site 
+3. Re-start HDFS
+
+Here is our configuration file:
+{
+    "deploy":{
+	    "directory":"/home/develop/deploy"
+	},
+    "hadoop":{
+        "version":"hadoop-2.6.0",
+        "user":"hadoop",
+        "namenode_port":"9000",
+        "hadoop_hosts":
+        {
+        "master":"test-01",
+        "datanodes":["test-01","test-02","test-03"]	  
+        },
+        "replication_factor":"3",
+        "data_folder":"/data",
+	    "yarn":{
+	        "resource_manager":
+	        {
+	        "host":"test-01",
+	        "resource_manager_port":"8050",
+	        "scheduler_port":"8035",
+	        "resource-tracker_port":"8025",
+	    	"mapreduce_job_tracker_port":"5431"
+	        }
+	}
+  },
+  "hbase":{
+       "user":"hbase",
+	   "version":"hbase-1.0.3",
+	   "hbase_hosts":{
+	        "zk_nodes":["test-01","test-02","test-03"],
+ 			"regionserver_nodes":["test-02","test-03"],
+			"backup_master_nodes":["test-02"]
+		}
+  },
+    "run_list": [
+        "recipe[hadoop::generate_hdfs-site_xml]"
+    ]
+}
+
+We have changed replication factor and we can save it as attrs.json. After that we perform curl for all our nodes:
+
+HOSTS=`cat attrs.json | ./jq -r '.hadoop.hadoop_hosts.datanodes' |sed  "/\[\|\]/d" | tr -d ',\n' |tr -d '"'`
+for HOST in $HOSTS
+do
+   curl -vX POST http://$HOST:5000/api/run_chef -d @attrs.json --header "Content-Type: application/json"
+done
+
+Then, we restart HDFS:
+curl -i test-01:5000/api/hadoop/stop_dfs; curl -i test-01:5000/api/hadoop/start_dfs
+
+And it's done.
+
   TODO:
   - Daemonize this!!
   - Build RPM package
