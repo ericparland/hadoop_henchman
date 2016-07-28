@@ -36,9 +36,10 @@ The Henchman is a small server-like script, which serves as a REST API interface
         "recipe[some_cookbook::some_recipe]"
       ]
     }
+    ```
   - http://{address}/api/get_config - GET - get the config file (attr.json)
   - http://{address}/api/{hadoop,hbase}/{stop_datanode,start_hbase,etc} - GET - trigger some action
-```
+
 
 Example:
 Let's say, we want to change something in our configuration, for example, HDFS replication factor from 1 to 3.
