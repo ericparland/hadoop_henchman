@@ -1,6 +1,6 @@
 #!/bin/bash
 sudo yum install wget -y
-wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -O jq
+[  -f jq ] || wget https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -O jq
 chmod +x jq
 HOSTS=`cat attrs.json | ./jq -r '.hadoop.hadoop_hosts.datanodes' |sed  "/\[\|\]/d" | tr -d ',\n' |tr -d '"'`
 DEPLOYMENT_DIR=`cat attrs.json | ./jq -r '.deploy.directory' |sed  "/\[\|\]/d" | tr -d ',\n' |tr -d '"'`
