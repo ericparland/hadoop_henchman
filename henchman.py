@@ -152,7 +152,7 @@ def start_hbase():
     os.system(command)
     return flask.jsonify({'start_hbase': 'triggered'}), 200
 
-@app.route('/api/hadoop/stop_hbase', methods=['GET'])
+@app.route('/api/hbase/stop_hbase', methods=['GET'])
 def stop_hbase():
     command = 'su '+ config["hbase"]["user"] +' -c "/opt/hbase/bin/stop-hbase.sh"'
     logger.info("Executing following command: "+command)
